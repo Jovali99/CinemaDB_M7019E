@@ -4,7 +4,7 @@ import com.ltu.m7019e.v23.themoviedb.model.Movie
 
 class Genres {
     val list = mutableListOf<String>()
-
+    //todo remove
     val comedy_movies = mutableListOf<Movie>()
     val action_movies = mutableListOf<Movie>()
     val romance_movies = mutableListOf<Movie>()
@@ -25,7 +25,7 @@ class Genres {
         list.add("Fantasy")
         list.add("Adventure")
 
-
+        //todo remove
         val movies = Movies()
         for (movie in movies.list) {
             for (genre in movie.genres) {
