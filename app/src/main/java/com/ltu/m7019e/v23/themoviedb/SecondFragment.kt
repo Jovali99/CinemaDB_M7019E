@@ -1,5 +1,7 @@
 package com.ltu.m7019e.v23.themoviedb
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,15 +9,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.ltu.m7019e.v23.themoviedb.database.Genres
 import com.ltu.m7019e.v23.themoviedb.database.Movies
 import com.ltu.m7019e.v23.themoviedb.databinding.GenreMovieItemBinding
-import com.ltu.m7019e.v23.themoviedb.databinding.MovieListItemBinding
-import kotlin.math.log
+
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -56,11 +59,31 @@ class SecondFragment : Fragment() {
             genreMovies.forEach { movie ->
                 val movieItem = DataBindingUtil.inflate<GenreMovieItemBinding>(LayoutInflater.from(requireContext()), R.layout.genre_movie_item, movieListLayoutContainer, false)
                 movieItem.movie = movie
+
+                // Creates a popup dialogue which will display information as well as a link to imbd
+                create_movie_info_popup(movieItem.root)
+
                 movieListLayoutContainer.addView(movieItem.root)
+
             }
         }
+
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
     }
+
+    fun create_movie_info_popup(movieView: View) {
+        movieView.findViewById<ImageView>(R.id.movie_poster_genre)?.setOnClickListener {
+            // inflate the popup dialog layout
+            val builder = AlertDialog.Builder(requireContext())
+            val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.movie_info_popup, null)
+            builder.setView(popupView)
+            val dialog = builder.create()
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) //needed for background
+            dialog.show()
+        }
+    }
+
+
 }
