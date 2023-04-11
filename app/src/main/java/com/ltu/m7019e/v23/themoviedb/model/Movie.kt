@@ -5,6 +5,9 @@ data class Movie(
         var posterPath: String,
         var releaseDate: String,
         var overview: String,
-        var genres: List<String>,
-        var imdb_link: String
+        // var genres: List<String>,
+        var genres: List<Pair<String, Int>>,
+        var imdb_link: String,
+        var id: Int = 0,
+        var voteAverage: Float = 0f
 )

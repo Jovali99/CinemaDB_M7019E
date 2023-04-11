@@ -18,9 +18,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
+import com.ltu.m7019e.v23.themoviedb.api.MovieApiClient
 import com.ltu.m7019e.v23.themoviedb.database.Genres
 import com.ltu.m7019e.v23.themoviedb.database.Movies
 import com.ltu.m7019e.v23.themoviedb.databinding.GenreMovieItemBinding
+import com.ltu.m7019e.v23.themoviedb.model.Genre
 
 
 /**
@@ -40,42 +42,74 @@ class SecondFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val genres = Genres()
+        val genreLayoutContainer = view.findViewById<LinearLayout>(R.id.genre_layout)
         val movies = Movies()
 
-        val genreLayoutContainer = view.findViewById<LinearLayout>(R.id.genre_layout)
+        getGenresApiCall { genreList ->
+            var genres = Genres()
+            genres.list = genres.addGenres(genreList)
 
-        genres.list.forEach { genre ->
-            val genreItem = LayoutInflater.from(requireContext()).inflate(R.layout.genre_item_list, genreLayoutContainer, false)
-            // Filters out the movies for the current genre
-            val genreMovies = movies.list.filter { it.genres.contains(genre)}
-            if (genreMovies.isEmpty()) {
-                // If no movies of the genre exist we remove the genre view
-                genreLayoutContainer.removeView(genreItem)
-            } else {
-                genreItem.findViewById<TextView>(R.id.genre_name)?.text = genre
-                genreLayoutContainer.addView(genreItem)
-            }
-            // find the current genre layout
-            val movieListLayoutContainer = genreItem.findViewById<LinearLayout>(R.id.list_of_movies)
-            // Adds all the movies with the corresponding genre to the list_of_movies view
-            genreMovies.forEach { movie ->
-                val movieItem = DataBindingUtil.inflate<GenreMovieItemBinding>(LayoutInflater.from(requireContext()), R.layout.genre_movie_item, movieListLayoutContainer, false)
-                movieItem.movie = movie
-                var imdb_link = movie.imdb_link
-                // Creates a popup dialogue which will display information as well as a link to imbd
-                create_movie_info_popup(movieItem.root, imdb_link)
+            Log.d("genre_list", "filled genre list: " + genres.list)
 
-                // On click action
-                movieListLayoutContainer.addView(movieItem.root)
+            genres.list.forEach { genre ->
+                val genreItem = LayoutInflater.from(requireContext()).inflate(R.layout.genre_item_list, genreLayoutContainer, false)
+
+                val genreMovies = movies.list.filter { it.genres.contains(genre)}   // Filter movies
+                if (genreMovies.isEmpty()) {
+                    // If no movies of the genre exist we remove the genre view
+                    genreLayoutContainer.removeView(genreItem)
+                } else {
+                    genreItem.findViewById<TextView>(R.id.genre_name)?.text = genre.first
+                    genreLayoutContainer.addView(genreItem)
+                }
+
+                val movieListLayoutContainer = genreItem.findViewById<LinearLayout>(R.id.list_of_movies)
+                // Adds all the movies with the corresponding genre to the list_of_movies view
+                genreMovies.forEach { movie ->
+                    val movieItem = DataBindingUtil.inflate<GenreMovieItemBinding>(LayoutInflater.from(requireContext()), R.layout.genre_movie_item, movieListLayoutContainer, false)
+                    movieItem.movie = movie
+                    var imdb_link = movie.imdb_link
+                    // Creates a popup dialogue which will display information as well as a link to imbd
+                    createMovieInfoPopup(movieItem.root, imdb_link)
+
+                    // On click action
+                    movieListLayoutContainer.addView(movieItem.root)
+                }
             }
         }
+
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
     }
 
-    fun create_movie_info_popup(movieView: View, imdb_link: String) {
+    private fun getGenresApiCall(callback: (List<Genre>) -> Unit) {
+        val movieApiClient = MovieApiClient()
+        movieApiClient.getGenres { genreList, error ->
+            if (error != null ) {
+                Log.d("error_genre_list", "genres list error : " + error)
+            } else if (genreList != null) {
+                Log.d("genre_list", "add genres to list: " + genreList)
+                callback(genreList)
+            }
+        }
+    }
+
+    /*
+    private fun getMoviesApiCall(callback: (List<Movie>) -> Unit) {
+        val movieApiClient = MovieApiClient()
+        movieApiClient.getGenres { genreList, error ->
+            if (error != null ) {
+                Log.d("error_genre_list", "genres list error : " + error)
+            } else if (genreList != null) {
+                Log.d("genre_list", "add genres to list: " + genreList)
+                callback(genreList)
+            }
+        }
+    }
+     */
+
+    private fun createMovieInfoPopup(movieView: View, imdb_link: String) {
         movieView.findViewById<ImageView>(R.id.movie_poster_genre)?.setOnClickListener {
             // inflate the popup dialog layout
             val builder = AlertDialog.Builder(requireContext())
@@ -91,10 +125,10 @@ class SecondFragment : Fragment() {
         }
     }
 
-    fun on_imdb_click(popUp: AlertDialog, imdb_link: String) {
+    private fun on_imdb_click(popUp: AlertDialog, imdb_link: String) {
         popUp.findViewById<FrameLayout>(R.id.imdb_logo_link)?.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(imdb_link))
-        requireContext().startActivity(intent)
+            requireContext().startActivity(intent)
         }
     }
 
