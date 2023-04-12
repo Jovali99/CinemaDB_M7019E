@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            app:posterImageUrl="@{movie.posterPath}"
+            app:posterImageUrl="@{movie.poster_path}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             tools:text="Movie Release Date"
-            android:text="@{movie.releaseDate}"
+            android:text="@{movie.release_date}"
             app:layout_constraintStart_toStartOf="@+id/movie_title"
             app:layout_constraintTop_toBottomOf="@+id/movie_title" />
 

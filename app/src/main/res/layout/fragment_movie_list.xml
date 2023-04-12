@@ -10,17 +10,29 @@
             type="com.ltu.m7019e.v23.themoviedb.database.Movies" />
     </data>
 
-    <ScrollView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <LinearLayout
-            android:id="@+id/movie_list_ll"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            tools:context=".MovieListFragment">
+            android:layout_height="match_parent">
 
-        </LinearLayout>
-    </ScrollView>
+
+            <LinearLayout
+                android:id="@+id/movie_list_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:context=".MovieListFragment">
+
+                <Button
+                    android:id="@+id/button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Genres" />
+
+            </LinearLayout>
+
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

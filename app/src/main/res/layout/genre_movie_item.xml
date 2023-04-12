@@ -28,7 +28,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:posterImageUrl="@{movie.posterPath}"
+            app:posterImageUrl="@{movie.poster_path}"
             tools:srcCompat="@tools:sample/avatars" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

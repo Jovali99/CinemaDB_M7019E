@@ -3,6 +3,7 @@ package com.ltu.m7019e.v23.themoviedb.api
 import android.util.Log
 import com.ltu.m7019e.v23.themoviedb.api.response.ApiGenreResponse
 import com.ltu.m7019e.v23.themoviedb.api.response.ApiMovieResponse
+import com.ltu.m7019e.v23.themoviedb.api.response.ApiPopularMoviesListResponse
 import com.ltu.m7019e.v23.themoviedb.database.Genres
 import com.ltu.m7019e.v23.themoviedb.model.Genre
 import com.ltu.m7019e.v23.themoviedb.model.Movie
@@ -17,7 +18,7 @@ class MovieApiClient {
     private val API_KEY = "4fb01808f41695becd422df6b0053141"
     private val API_MOVIE = "https://api.themoviedb.org/3/movie/550?api_key="
     private val API_POP_MOVIES_URL = "https://api.themoviedb.org/3/movie/popular?api_key="
-    private val PAGES = 3
+    private val PAGES = 1
     private val LANGUAGE = "en-US"
 
     private val apiService: ApiService by lazy {
@@ -49,36 +50,50 @@ class MovieApiClient {
         })
     }
 
+    fun getPopularMovies(page: Int = PAGES, callback: (List<Movie>?, Throwable?) -> Unit) {
+        apiService.getPopularMovies(pages = PAGES, apiKey = API_KEY).enqueue(object : Callback<ApiPopularMoviesListResponse> {
+            override fun onResponse(call: Call<ApiPopularMoviesListResponse>, response: Response<ApiPopularMoviesListResponse>) {
+                if (response.isSuccessful) {
+                    val apiPopMovieResponse = response.body()
+                    Log.d("pop_movie_list", "api response: "+ apiPopMovieResponse)
+                    val movieList = apiPopMovieResponse?.popularMovies?.map { movieObj ->
+                        movieObj?.toMovie()
+                    }
+                    callback(movieList as List<Movie>?,null)
+
+                } else {
+                    callback(null, Throwable(response.message()))
+                }
+            }
+            override fun onFailure(call: Call<ApiPopularMoviesListResponse>, t: Throwable) {
+                callback(null, t)
+            }
+        })
+    }
+
     private fun Genre.toGenre(): Genre? {
         return if (this.id != null) {
             Genre(
-                id = this.id,
-                name = this.name ?: "",
+                id = this.id ?: 0,
+                name = this.name ?: ""
             )
         } else {
             null
         }
     }
 
-    private fun ApiMovieResponse.toMovie(): Movie? {
+    private fun Movie.toMovie(): Movie? {
         return if (this.id != null) {
-
-            /*
-            if genre == i tuple
-            index a lista = genre för filmen
-             */
-
-            val movie_genres = listOf(Pair("Comedy", 35))
-            val imdb_link = "Empty"
             Movie(
-                id = this.id,
-                title = this.title ?: "",
+                poster_path = this.poster_path ?: "",
                 overview = this.overview ?: "",
-                releaseDate = this.releaseDate ?: "",
-                posterPath = this.posterPath ?: "",
-                voteAverage = (this.voteAverage ?: 0.0) as Float,
-                genres = movie_genres,
-                imdb_link = imdb_link
+                release_date = this.release_date,
+                movie_genres = this.movie_genres,
+                id = this.id ?: 0,
+                title = this.title ?: "",
+                popularity = this.popularity ?: 0f,
+                vote_average = this.vote_average ?: 0f,
+                imdb_link = ""
             )
         } else {
             null

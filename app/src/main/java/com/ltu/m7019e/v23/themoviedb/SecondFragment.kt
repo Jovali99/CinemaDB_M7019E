@@ -23,13 +23,13 @@ import com.ltu.m7019e.v23.themoviedb.database.Genres
 import com.ltu.m7019e.v23.themoviedb.database.Movies
 import com.ltu.m7019e.v23.themoviedb.databinding.GenreMovieItemBinding
 import com.ltu.m7019e.v23.themoviedb.model.Genre
+import com.ltu.m7019e.v23.themoviedb.model.Movie
 
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class SecondFragment : Fragment() {
-
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
@@ -54,7 +54,7 @@ class SecondFragment : Fragment() {
             genres.list.forEach { genre ->
                 val genreItem = LayoutInflater.from(requireContext()).inflate(R.layout.genre_item_list, genreLayoutContainer, false)
 
-                val genreMovies = movies.list.filter { it.genres.contains(genre)}   // Filter movies
+                val genreMovies = movies.list.filter { it.movie_genres.contains(genre.second)}   // Filter movies
                 if (genreMovies.isEmpty()) {
                     // If no movies of the genre exist we remove the genre view
                     genreLayoutContainer.removeView(genreItem)
@@ -87,7 +87,7 @@ class SecondFragment : Fragment() {
         val movieApiClient = MovieApiClient()
         movieApiClient.getGenres { genreList, error ->
             if (error != null ) {
-                Log.d("error_genre_list", "genres list error : " + error)
+                Log.d("error_genre_list", "genre list error : " + error)
             } else if (genreList != null) {
                 Log.d("genre_list", "add genres to list: " + genreList)
                 callback(genreList)
@@ -95,19 +95,19 @@ class SecondFragment : Fragment() {
         }
     }
 
-    /*
+
     private fun getMoviesApiCall(callback: (List<Movie>) -> Unit) {
         val movieApiClient = MovieApiClient()
-        movieApiClient.getGenres { genreList, error ->
+        movieApiClient.getPopularMovies(page = 2) { movieList, error ->
             if (error != null ) {
-                Log.d("error_genre_list", "genres list error : " + error)
-            } else if (genreList != null) {
-                Log.d("genre_list", "add genres to list: " + genreList)
-                callback(genreList)
+                Log.d("error_movie_list", "movie list error : " + error)
+            } else if (movieList != null) {
+                Log.d("movie_list", "add movies to list: " + movieList)
+                callback(movieList)
             }
         }
     }
-     */
+
 
     private fun createMovieInfoPopup(movieView: View, imdb_link: String) {
         movieView.findViewById<ImageView>(R.id.movie_poster_genre)?.setOnClickListener {

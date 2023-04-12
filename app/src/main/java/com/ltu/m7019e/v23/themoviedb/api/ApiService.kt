@@ -17,7 +17,7 @@ interface ApiService {
 
     @GET("movie/popular")
     fun getPopularMovies(
-        @Path("page") pages: Int,
+        @Query("page") pages: Int,
         @Query("api_key") apiKey: String
     ): Call<ApiPopularMoviesListResponse>
 
@@ -26,4 +26,5 @@ interface ApiService {
         @Query("language") language: String,
         @Query("api_key") apiKey: String
     ): Call<ApiGenreResponse>
+
 }
