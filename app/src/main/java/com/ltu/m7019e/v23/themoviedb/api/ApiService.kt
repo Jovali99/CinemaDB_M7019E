@@ -9,9 +9,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
-    @GET("movie/{id}")
+    @GET("movie/{movie_id}")
     fun getMovieDetails(
-        @Path("id") movieId: String,
+        @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String
     ): Call<ApiMovieResponse>
 

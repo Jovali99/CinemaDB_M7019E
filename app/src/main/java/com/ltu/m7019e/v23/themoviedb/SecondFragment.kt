@@ -81,6 +81,7 @@ class SecondFragment : Fragment() {
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
+
     }
 
     private fun getGenresApiCall(callback: (List<Genre>) -> Unit) {
@@ -94,20 +95,6 @@ class SecondFragment : Fragment() {
             }
         }
     }
-
-
-    private fun getMoviesApiCall(callback: (List<Movie>) -> Unit) {
-        val movieApiClient = MovieApiClient()
-        movieApiClient.getPopularMovies(page = 2) { movieList, error ->
-            if (error != null ) {
-                Log.d("error_movie_list", "movie list error : " + error)
-            } else if (movieList != null) {
-                Log.d("movie_list", "add movies to list: " + movieList)
-                callback(movieList)
-            }
-        }
-    }
-
 
     private fun createMovieInfoPopup(movieView: View, imdb_link: String) {
         movieView.findViewById<ImageView>(R.id.movie_poster_genre)?.setOnClickListener {
@@ -131,6 +118,4 @@ class SecondFragment : Fragment() {
             requireContext().startActivity(intent)
         }
     }
-
-
 }

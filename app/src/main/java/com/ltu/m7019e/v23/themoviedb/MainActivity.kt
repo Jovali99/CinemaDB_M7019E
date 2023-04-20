@@ -13,8 +13,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // api call
-
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
     }
@@ -25,21 +23,32 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    //todo
+    // 1. Pass data from one fragment to another
+    // 2. Refactor to view models
+    // 3. imdb for each movie
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
 
-            R.id.action_settings -> {
+            R.id.action_home -> {
                 val navController = Navigation.findNavController(this,R.id.nav_host_fragment)
-                navController.navigate(R.id.SettingsFragment)
+                navController.navigate(R.id.FirstFragment)
                 true
             }
 
             R.id.action_genres -> {
                 val navController = Navigation.findNavController(this,R.id.nav_host_fragment)
                 navController.navigate(R.id.SecondFragment)
+                true
+            }
+
+            R.id.action_settings -> {
+                val navController = Navigation.findNavController(this,R.id.nav_host_fragment)
+                navController.navigate(R.id.SettingsFragment)
                 true
             }
 

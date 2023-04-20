@@ -16,8 +16,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MovieApiClient {
 
     private val API_KEY = "4fb01808f41695becd422df6b0053141"
-    private val API_MOVIE = "https://api.themoviedb.org/3/movie/550?api_key="
-    private val API_POP_MOVIES_URL = "https://api.themoviedb.org/3/movie/popular?api_key="
     private val PAGES = 1
     private val LANGUAGE = "en-US"
 
@@ -71,6 +69,25 @@ class MovieApiClient {
         })
     }
 
+    fun getMovieDetails(movieID: Int, callback: (String?, Throwable?) -> Unit) {
+        apiService.getMovieDetails(movieID, apiKey = API_KEY).enqueue(object : Callback<ApiMovieResponse> {
+            override fun onResponse(call: Call<ApiMovieResponse>, response: Response<ApiMovieResponse>) {
+                if (response.isSuccessful) {
+                    val apiMovieDetailsResponse = response.body()
+                    Log.d("movie_link", "api response: "+ apiMovieDetailsResponse)
+                    val movie_link = apiMovieDetailsResponse?.imdb_link
+                    Log.d("movie_link", "api response: "+ movie_link)
+                    callback(movie_link,null)
+                } else {
+                    callback(null, Throwable(response.message()))
+                }
+            }
+            override fun onFailure(call: Call<ApiMovieResponse>, t: Throwable) {
+                callback(null, t)
+            }
+        })
+    }
+
     private fun Genre.toGenre(): Genre? {
         return if (this.id != null) {
             Genre(
@@ -87,13 +104,13 @@ class MovieApiClient {
             Movie(
                 poster_path = this.poster_path ?: "",
                 overview = this.overview ?: "",
-                release_date = this.release_date,
-                movie_genres = this.movie_genres,
+                release_date = this.release_date ?: "",
+                movie_genres = this.movie_genres ?: listOf(),
                 id = this.id ?: 0,
                 title = this.title ?: "",
                 popularity = this.popularity ?: 0f,
                 vote_average = this.vote_average ?: 0f,
-                imdb_link = ""
+                imdb_link = this.imdb_link ?: ""
             )
         } else {
             null
