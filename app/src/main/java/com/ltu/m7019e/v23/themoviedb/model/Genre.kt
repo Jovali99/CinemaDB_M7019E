@@ -6,5 +6,6 @@ data class Genre(
     @SerializedName("id")
     val id: Int? = null,
     @SerializedName("name")
-    val name: String? = null
+    val name: String? = null,
+    var movieList: List<Movie>? = null
 )

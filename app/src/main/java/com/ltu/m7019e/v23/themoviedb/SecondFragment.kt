@@ -1,47 +1,84 @@
 package com.ltu.m7019e.v23.themoviedb
 
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.ltu.m7019e.v23.themoviedb.api.MovieApiClient
-import com.ltu.m7019e.v23.themoviedb.database.Genres
-import com.ltu.m7019e.v23.themoviedb.database.Movies
-import com.ltu.m7019e.v23.themoviedb.databinding.GenreMovieItemBinding
-import com.ltu.m7019e.v23.themoviedb.model.Genre
-import com.ltu.m7019e.v23.themoviedb.model.Movie
+import com.ltu.m7019e.v23.themoviedb.adapter.GenreListAdapter
+import com.ltu.m7019e.v23.themoviedb.databinding.FragmentSecondBinding
+import com.ltu.m7019e.v23.themoviedb.viewmodel.SecondFragmentViewModel
+import com.ltu.m7019e.v23.themoviedb.viewmodel.SecondFragmentViewModelFactory
 
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class SecondFragment : Fragment() {
+
+    private lateinit var viewModel: SecondFragmentViewModel
+    private lateinit var viewModelFactory: SecondFragmentViewModelFactory
+
+    private var _binding: FragmentSecondBinding? = null;
+    private val binding get() = _binding!!
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
 
+        _binding = FragmentSecondBinding.inflate(inflater)
+
+        val application = requireNotNull(this.activity).application
+
+        viewModelFactory = SecondFragmentViewModelFactory(application)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(SecondFragmentViewModel::class.java)
+
+
+
+
+        // Set up the RecyclerView
+        val adapter = GenreListAdapter()
+        binding.genreListRv.adapter = adapter
+
+        viewModel.genreList.observe(
+            viewLifecycleOwner
+        ) { genreList ->
+            genreList?.let {
+                adapter.submitList(genreList)
+            }
+        }
+
+        /*
+        viewModel.navigateToMovieDetail.observe(viewLifecycleOwner) { movie ->
+            movie?.let{
+                // inflate the popup dialog layout
+                val builder = AlertDialog.Builder(requireContext())
+                val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.movie_info_popup, null)
+                builder.setView(popupView)
+                val dialog = builder.create()
+                dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) //needed for background
+
+                dialog.show()
+
+                viewModel.on_imdb_click(requireContext(), dialog, movie.imdb_link)
+
+
+                viewModel.onMovieDetailNavigated()
+            }
+        }*/
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_second, container, false)
+        Log.d("rec_test", "onCreateView: "+ binding)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        /*
         val genreLayoutContainer = view.findViewById<LinearLayout>(R.id.genre_layout)
         val movies = Movies()
 
@@ -76,7 +113,7 @@ class SecondFragment : Fragment() {
                     movieListLayoutContainer.addView(movieItem.root)
                 }
             }
-        }
+        }*/
 
         view.findViewById<Button>(R.id.button_second).setOnClickListener {
             findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
@@ -84,38 +121,4 @@ class SecondFragment : Fragment() {
 
     }
 
-    private fun getGenresApiCall(callback: (List<Genre>) -> Unit) {
-        val movieApiClient = MovieApiClient()
-        movieApiClient.getGenres { genreList, error ->
-            if (error != null ) {
-                Log.d("error_genre_list", "genre list error : " + error)
-            } else if (genreList != null) {
-                Log.d("genre_list", "add genres to list: " + genreList)
-                callback(genreList)
-            }
-        }
-    }
-
-    private fun createMovieInfoPopup(movieView: View, imdb_link: String) {
-        movieView.findViewById<ImageView>(R.id.movie_poster_genre)?.setOnClickListener {
-            // inflate the popup dialog layout
-            val builder = AlertDialog.Builder(requireContext())
-            val popupView = LayoutInflater.from(requireContext()).inflate(R.layout.movie_info_popup, null)
-            builder.setView(popupView)
-            val dialog = builder.create()
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) //needed for background
-
-            dialog.show()
-
-            on_imdb_click(dialog, imdb_link)
-
-        }
-    }
-
-    private fun on_imdb_click(popUp: AlertDialog, imdb_link: String) {
-        popUp.findViewById<FrameLayout>(R.id.imdb_logo_link)?.setOnClickListener {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(imdb_link))
-            requireContext().startActivity(intent)
-        }
-    }
 }

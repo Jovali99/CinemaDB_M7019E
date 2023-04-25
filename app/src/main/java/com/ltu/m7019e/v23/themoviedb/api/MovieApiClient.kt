@@ -49,7 +49,7 @@ class MovieApiClient {
     }
 
     fun getPopularMovies(page: Int = PAGES, callback: (List<Movie>?, Throwable?) -> Unit) {
-        apiService.getPopularMovies(pages = PAGES, apiKey = API_KEY).enqueue(object : Callback<ApiPopularMoviesListResponse> {
+        apiService.getPopularMovies(pages = page, apiKey = API_KEY).enqueue(object : Callback<ApiPopularMoviesListResponse> {
             override fun onResponse(call: Call<ApiPopularMoviesListResponse>, response: Response<ApiPopularMoviesListResponse>) {
                 if (response.isSuccessful) {
                     val apiPopMovieResponse = response.body()
@@ -92,7 +92,8 @@ class MovieApiClient {
         return if (this.id != null) {
             Genre(
                 id = this.id ?: 0,
-                name = this.name ?: ""
+                name = this.name ?: "",
+                movieList = null
             )
         } else {
             null
